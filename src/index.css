@@ -8,6 +8,14 @@ img {
   max-width: 100%;
 }
 
+p,
+h1,
+h2,
+h3,
+small {
+  overflow-wrap: anywhere;
+}
+
 body {
   margin: 0;
   font-family: system-ui, sans-serif;
@@ -124,6 +132,7 @@ button.active {
   background: #f3f4f6;
 }
 
+
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -225,7 +234,7 @@ button.active {
 
 .features {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
   gap: 16px;
   width: 100%;
   max-width: 960px;
@@ -310,7 +319,6 @@ button.active {
   background: white;
   border-top: 1px solid #e5e7eb;
 }
-
 
 .login-page {
   min-height: 100vh;
@@ -408,7 +416,7 @@ button.active {
 
 .album-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr));
   gap: 16px;
   margin-bottom: 32px;
 }
@@ -556,6 +564,26 @@ button.active {
   font: inherit;
 }
 
+.shared-list {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.chip {
+  max-width: 100%;
+  padding: 2px 10px;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .filter-bar {
   display: flex;
   flex-wrap: wrap;
@@ -585,10 +613,9 @@ button.active {
   font-size: 13px;
 }
 
-
 .image-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr));
   gap: 16px;
 }
 
@@ -653,7 +680,6 @@ button.active {
   gap: 16px;
   margin: 24px 0;
 }
-
 
 .comments {
   margin-top: 10px;

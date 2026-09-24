@@ -22,6 +22,8 @@ export default function ShareForm({ albumId, sharedWith, onShared }) {
 
   const available = users.filter((u) => !sharedWith.includes(u.email));
 
+  const everyoneHasAccess = users.length > 0 && available.length === 0;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -51,16 +53,25 @@ export default function ShareForm({ albumId, sharedWith, onShared }) {
       <h3>Share this album</h3>
 
       {sharedWith.length > 0 && (
-        <p className="muted">Shared with: {sharedWith.join(", ")}</p>
+        <div className="shared-list">
+          <span className="muted">Shared with:</span>
+          {sharedWith.map((email) => (
+            <span key={email} className="chip" title={email}>
+              {email}
+            </span>
+          ))}
+        </div>
       )}
 
       {loadingUsers ? (
         <p className="muted">Loading users...</p>
       ) : usersError ? (
         <p className="error">{usersError}</p>
+      ) : everyoneHasAccess ? (
+        <p className="muted">This album is already shared with everyone on KaviosPix.</p>
       ) : available.length === 0 ? (
         <p className="muted">
-          No other users to share with. Ask your friend to sign in to KaviosPix once.
+          No other users yet. Ask your friend to sign in to KaviosPix once.
         </p>
       ) : (
         <>
