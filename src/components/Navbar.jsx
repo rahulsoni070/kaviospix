@@ -11,19 +11,20 @@ export default function Navbar() {
   };
 
   return (
-    <nav>
-      <Link to="/albums">KaviosPix</Link>
-      <div>
+    <nav className="navbar">
+        <Link to="/albums" className="logo">📷 KaviosPix</Link>
+
+        <div className="nav-user">
         <img
-          src={user.avatar}
-          alt={user.name}
-          width="32"
-          height="32"
-          referrerPolicy="no-referrer"
+            src={user.avatar}
+            alt={user.name}
+            width="32"
+            height="32"
+            referrerPolicy="no-referrer"
         />
-        <span>{user.name}</span>
+        <span className="nav-name">{user.name}</span>
         <button onClick={handleLogout}>Logout</button>
-      </div>
+        </div>
     </nav>
-  );
+    )
 }

@@ -1,22 +1,28 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import api from "../api/axios";
 
 export default function ShareForm({ albumId, sharedWith, onShared }) {
-  const [input, setInput] = useState("");
+  const [users, setUsers] = useState([]);
+  const [selected, setSelected] = useState("");
+  const [loadingUsers, setLoadingUsers] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    api.get("/users")
+      .then((res) => setUsers(res.data))
+      .catch(() => setError("Could not load users"))
+      .finally(() => setLoadingUsers(false));
+  }, []);
+
+  const available = users.filter((u) => !sharedWith.includes(u.email));
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const emails = input
-      .split(",")
-      .map((email) => email.trim().toLowerCase())
-      .filter(Boolean);
-
-    if (emails.length === 0) {
-      setError("Enter at least one email");
+    if (!selected) {
+      setError("Please choose a user");
       return;
     }
 
@@ -25,10 +31,10 @@ export default function ShareForm({ albumId, sharedWith, onShared }) {
     setMessage("");
 
     try {
-      await api.post(`/albums/${albumId}/share`, { emails });
-      onShared(emails);
-      setInput("");
-      setMessage(`Shared with ${emails.join(", ")}`);
+      await api.post(`/albums/${albumId}/share`, { emails: [selected] });
+      onShared([selected]);
+      setMessage(`Shared with ${selected}`);
+      setSelected("");
     } catch (err) {
       setError(err.response?.data?.message || "Could not share album");
     } finally {
@@ -44,15 +50,27 @@ export default function ShareForm({ albumId, sharedWith, onShared }) {
         <p className="muted">Shared with: {sharedWith.join(", ")}</p>
       )}
 
-      <input
-        type="text"
-        placeholder="friend@gmail.com, another@gmail.com"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-      />
-      <button type="submit" disabled={saving}>
-        {saving ? "Sharing..." : "Share"}
-      </button>
+      {loadingUsers ? (
+        <p className="muted">Loading users...</p>
+      ) : available.length === 0 ? (
+        <p className="muted">
+          No other users to share with. Ask your friend to sign in to KaviosPix once.
+        </p>
+      ) : (
+        <>
+          <select value={selected} onChange={(e) => setSelected(e.target.value)}>
+            <option value="">Select a user...</option>
+            {available.map((u) => (
+              <option key={u._id} value={u.email}>
+                {u.name} ({u.email})
+              </option>
+            ))}
+          </select>
+          <button type="submit" disabled={saving || !selected}>
+            {saving ? "Sharing..." : "Share"}
+          </button>
+        </>
+      )}
 
       {message && <p className="success">{message}</p>}
       {error && <p className="error">{error}</p>}
