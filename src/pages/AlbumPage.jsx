@@ -23,9 +23,11 @@ export default function AlbumPage() {
 
   const [tagFilter, setTagFilter] = useState("");
   const [showFavorites, setShowFavorites] = useState(false);
+  const [filterKey, setFilterKey] = useState(0);
 
   useEffect(() => {
-    api.get(`/albums/${albumId}`)
+    api
+      .get(`/albums/${albumId}`)
       .then((res) => setAlbum(res.data))
       .catch((err) =>
         setAlbumError(err.response?.data?.message || "Could not load album")
@@ -58,11 +60,11 @@ export default function AlbumPage() {
       .finally(() => setImagesLoading(false));
   }, [albumId, page, refreshKey, tagFilter, showFavorites]);
 
-
   const handleUploaded = () => {
     setAlbum((prev) => ({ ...prev, imageCount: prev.imageCount + 1 }));
     setShowFavorites(false);
     setTagFilter("");
+    setFilterKey((k) => k + 1);
     setPage(1);
     setRefreshKey((k) => k + 1);
   };
@@ -115,11 +117,10 @@ export default function AlbumPage() {
     }
   };
 
-
   if (albumError) {
     return (
       <div className="page">
-        <Link to="/albums">← Back to albums</Link>
+        <Link to="/albums" className="back-btn">← Back to albums</Link>
         <p className="error">{albumError}</p>
       </div>
     );
@@ -128,16 +129,17 @@ export default function AlbumPage() {
   if (!album) return <p className="page">Loading album...</p>;
 
   const filtering = tagFilter || showFavorites;
+  const photoWord = album.imageCount === 1 ? "photo" : "photos";
 
   return (
     <div className="page">
-      <Link to="/albums">← Back to albums</Link>
+      <Link to="/albums" className="back-btn">← Back to albums</Link>
 
       <div className="album-header">
         <h1>{album.name}</h1>
         {album.description && <p>{album.description}</p>}
         <p className="muted">
-          by {album.ownerId.name} · {album.imageCount} photos
+          by {album.ownerId.name} · {album.imageCount} {photoWord}
           {!album.isOwner && " · 🔗 Shared with you"}
         </p>
       </div>
@@ -157,13 +159,16 @@ export default function AlbumPage() {
       )}
 
       <FilterBar
+        key={filterKey}
         tagFilter={tagFilter}
         showFavorites={showFavorites}
         onApplyTag={handleApplyTag}
         onToggleFavorites={handleToggleFavorites}
       />
 
-      {tagFilter && <p className="muted">Showing photos tagged #{tagFilter}</p>}
+      {tagFilter && (
+        <p className="muted">Showing photos with tags starting with #{tagFilter}</p>
+      )}
 
       {imagesLoading ? (
         <p>Loading photos...</p>

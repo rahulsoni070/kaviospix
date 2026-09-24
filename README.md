@@ -1,6 +1,6 @@
 # KaviosPix
 
-A Google Photos–style image management app: sign in with Google, create albums, upload photos with tags, mark favorites, add comments, and share albums with friends by email.
+A Google Photos–style image management app: sign in with Google, create albums, upload photos with tags, mark favorites, add comments, and share albums with friends.
 Built with a React frontend, Express/Node backend, MongoDB (Mongoose) database, Cloudinary for image storage, and Google OAuth 2.0 + JWT authentication with owner/shared-user permissions.
 
 ## Demo Link
@@ -13,7 +13,7 @@ Built with a React frontend, Express/Node backend, MongoDB (Mongoose) database, 
 
 Sign in with any Google account. No password or sign-up needed.
 
-To try sharing, open the app in a second browser (or an Incognito window) with a different Google account, then share an album with that account's email.
+To try sharing, open the app in a second browser (or an Incognito window) and sign in with a different Google account. That account will then appear in the share dropdown.
 
 ## Quick Start
 
@@ -85,6 +85,11 @@ In Google Cloud Console, create an OAuth client (Web application) and add `http:
 
 ## Features
 
+### Landing Page
+
+* Public home page that explains the app to new visitors
+* Any action, like creating an album, sends the visitor to sign in first
+
 ### Authentication
 
 * Sign in with Google (OAuth 2.0)
@@ -94,7 +99,8 @@ In Google Cloud Console, create an OAuth client (Web application) and add `http:
 ### Albums
 
 * Create albums with a name and description
-* Update album description
+* Edit an album's description directly from the Home page (owner only)
+* Search albums by name
 * Delete an album along with all its photos (files are also removed from Cloudinary)
 * "My albums" and "Shared with me" sections
 
@@ -113,12 +119,13 @@ In Google Cloud Console, create an OAuth client (Web application) and add `http:
 
 ### Search & Filters
 
-* Filter photos by tag
+* Search photos by tag: results appear after typing 3 letters, and partial tags match (`bea` finds `#beach`)
 * Show favorites only
 
 ### Sharing & Permissions
 
-* Share an album with other registered users by email
+* Share an album by picking a registered user from a dropdown, so there's no guessing emails
+* Users who already have access are hidden from the dropdown
 
 | Action | Owner | Shared user |
 | --- | :---: | :---: |
@@ -126,6 +133,10 @@ In Google Cloud Console, create an OAuth client (Web application) and add `http:
 | Add comments | ✅ | ✅ |
 | Upload, favorite or delete photos | ✅ | ❌ |
 | Edit, share or delete the album | ✅ | ❌ |
+
+### Responsive Design
+
+* Works on phones, tablets and desktops (tested from 360px wide)
 
 ### Security
 
@@ -153,6 +164,15 @@ Sample Response:
 { "_id": "...", "name": "...", "email": "...", "avatar": "..." }
 ```
 
+### Users
+
+`GET /api/users` — List other registered users (used by the share dropdown)
+Sample Response:
+
+```
+[{ "_id": "...", "name": "...", "email": "...", "avatar": "..." }, ...]
+```
+
 ### Albums
 
 `GET /api/albums` — List albums you own and albums shared with you
@@ -177,6 +197,11 @@ Sample Response:
 ```
 
 `PUT /api/albums/:albumId` (owner) — Update album description
+Body:
+
+```
+{ "description": "Updated description for the album" }
+```
 
 `DELETE /api/albums/:albumId` (owner) — Delete the album and all its photos
 Sample Response:
@@ -185,7 +210,7 @@ Sample Response:
 { "message": "Album deleted", "albumId": "...", "imagesDeleted": 4 }
 ```
 
-`POST /api/albums/:albumId/share` (owner) — Share with users by email
+`POST /api/albums/:albumId/share` (owner) — Share with registered users by email
 Body:
 
 ```
@@ -201,7 +226,7 @@ Sample Response:
 { "images": [{ "_id": "...", "name": "beach.jpg", "imageUrl": "https://res.cloudinary.com/...", "tags": ["beach"], "person": "Rahul", "isFavorite": true, "size": 310053, "comments": [...], "uploadedAt": "..." }], "page": 1, "limit": 20, "total": 4, "totalPages": 1 }
 ```
 
-`GET /api/albums/:albumId/images?tags=beach` — Filter photos by tag
+`GET /api/albums/:albumId/images?tags=bea` — Filter photos by tag (matches tags that start with the text, e.g. `bea` → `beach`)
 
 `GET /api/albums/:albumId/images/favorites` (owner or shared) — List favorite photos
 
@@ -244,6 +269,8 @@ Sample Response:
 * **Cloudinary for images:** photos are stored on Cloudinary; MongoDB only stores the image URL and `publicId` (used to delete the file later).
 * **MongoDB `_id` as the id:** every document already has a unique `_id`, so no separate UUID field is used.
 * **Emails in `sharedWith`:** albums store lowercased emails, which makes "shared with me" a simple lookup by the user's email.
+* **Share dropdown:** users pick from registered accounts instead of typing an email, so sharing can't fail because of a typo or an unknown user. The backend still validates every share.
+* **Prefix tag search:** tags are stored in lowercase, and the search matches the start of a tag (`^bea`), which works well with the `{ albumId, tags }` index.
 * **Comments as objects:** each comment stores `text`, `userId` and `createdAt` instead of a plain string, so the app can show who wrote it and when.
 * **JWT instead of sessions:** stateless auth that works across the separate frontend (Vercel) and backend (Render) domains.
 

@@ -37,6 +37,7 @@ body {
   color: #4f46e5;
 }
 
+
 button {
   cursor: pointer;
   padding: 6px 12px;
@@ -67,6 +68,45 @@ button.active {
   color: #4f46e5;
 }
 
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: #4f46e5;
+  color: white;
+  border: 1px solid #4f46e5;
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #4338ca;
+  border-color: #4338ca;
+}
+
+.btn-lg {
+  padding: 12px 24px;
+  font-size: 17px;
+}
+
+.link-btn {
+  padding: 0;
+  border: none;
+  background: none;
+  color: #4f46e5;
+  font-size: 14px;
+}
+
+.link-btn:hover:not(:disabled) {
+  background: none;
+  text-decoration: underline;
+}
+
 .back-btn {
   display: inline-flex;
   align-items: center;
@@ -83,7 +123,6 @@ button.active {
 .back-btn:hover {
   background: #f3f4f6;
 }
-
 
 .navbar {
   display: flex;
@@ -123,6 +162,156 @@ button.active {
   max-width: 160px;
 }
 
+
+.landing {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.hero {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 72px 16px 40px;
+  text-align: center;
+}
+
+.hero h1 {
+  margin: 0 0 16px;
+  font-size: clamp(30px, 6vw, 48px);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.hero-sub {
+  max-width: 560px;
+  margin: 0 auto 28px;
+  font-size: 18px;
+  line-height: 1.5;
+  color: #57606a;
+}
+
+.hero-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.try-form {
+  display: flex;
+  gap: 8px;
+  max-width: 520px;
+  margin: 32px auto 8px;
+  padding: 8px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+}
+
+.try-form input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  font: inherit;
+}
+
+.try-note {
+  margin: 0;
+  font-size: 13px;
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+}
+
+.feature-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.feature-icon {
+  font-size: 28px;
+}
+
+.feature-card h3 {
+  margin: 10px 0 6px;
+  font-size: 17px;
+}
+
+.feature-card p {
+  margin: 0;
+  line-height: 1.5;
+  color: #57606a;
+}
+
+.steps {
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 8px 16px 56px;
+  text-align: center;
+}
+
+.steps h2 {
+  margin: 0 0 20px;
+}
+
+.steps ol {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+.steps li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  text-align: left;
+  counter-increment: step;
+}
+
+.steps li::before {
+  content: counter(step);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #eef2ff;
+  color: #4f46e5;
+  font-weight: 700;
+}
+
+.landing-footer {
+  margin-top: auto;
+  padding: 24px 16px;
+  text-align: center;
+  font-size: 14px;
+  color: #6e7781;
+  background: white;
+  border-top: 1px solid #e5e7eb;
+}
+
+
 .login-page {
   min-height: 100vh;
   display: flex;
@@ -149,6 +338,15 @@ button.active {
   margin: 0 0 24px;
 }
 
+.login-card .login-message {
+  margin: 0 0 16px;
+  padding: 8px 12px;
+  background: #eef2ff;
+  color: #4338ca;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
 .google-btn {
   display: inline-block;
   padding: 10px 20px;
@@ -163,6 +361,12 @@ button.active {
   background: #4338ca;
 }
 
+.login-back {
+  display: block;
+  margin-top: 16px;
+  font-size: 14px;
+  color: #57606a;
+}
 
 .create-form {
   display: flex;
@@ -189,6 +393,19 @@ button.active {
   min-width: 180px;
 }
 
+.search-box {
+  margin-bottom: 8px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 10px 12px;
+  background: white;
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  font: inherit;
+}
+
 .album-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -197,27 +414,69 @@ button.active {
 }
 
 .album-card {
-  display: block;
+  display: flex;
+  flex-direction: column;
   background: white;
   padding: 16px;
   border-radius: 10px;
   border: 1px solid #e5e7eb;
-  text-decoration: none;
-  color: inherit;
 }
 
 .album-card:hover {
   border-color: #4f46e5;
 }
 
-.album-card h3 {
+.album-link {
+  display: block;
+  flex: 1;
+  color: inherit;
+  text-decoration: none;
+}
+
+.album-link h3 {
   margin: 0 0 6px;
 }
 
-.album-card p {
+.album-link p {
   margin: 0 0 8px;
+}
+
+.album-desc {
   color: #57606a;
 }
+
+.album-actions {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #f0f1f3;
+}
+
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.edit-form textarea {
+  width: 100%;
+  min-height: 72px;
+  padding: 8px 10px;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  font: inherit;
+  resize: vertical;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.edit-form .error {
+  margin: 0;
+}
+
 
 .album-header {
   margin: 16px 0 24px;
@@ -319,6 +578,13 @@ button.active {
   border: 1px solid #d0d7de;
   border-radius: 6px;
 }
+
+.filter-hint {
+  width: 100%;
+  margin: 0;
+  font-size: 13px;
+}
+
 
 .image-grid {
   display: grid;
@@ -442,6 +708,10 @@ button.active {
   .album-header h1 {
     font-size: 24px;
   }
+
+  .hero {
+    padding: 48px 16px 32px;
+  }
 }
 
 @media (max-width: 600px) {
@@ -456,12 +726,21 @@ button.active {
   .create-form button,
   .upload-form button,
   .share-form button,
-  .filter-bar > button {
+  .filter-bar > button,
+  .hero-actions .btn-primary {
     width: 100%;
   }
 
   .upload-form input[type="file"] {
     width: 100%;
+  }
+
+  .try-form {
+    flex-direction: column;
+  }
+
+  .hero-sub {
+    font-size: 16px;
   }
 }
 

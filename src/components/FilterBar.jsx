@@ -1,12 +1,27 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-export default function FilterBar({ tagFilter, showFavorites, onApplyTag, onToggleFavorites }) {
+const MIN_LETTERS = 3;
+
+export default function FilterBar({
+  tagFilter,
+  showFavorites,
+  onApplyTag,
+  onToggleFavorites,
+}) {
   const [input, setInput] = useState(tagFilter);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onApplyTag(input.trim().toLowerCase());
-  };
+  const text = input.trim().toLowerCase();
+  const tooShort = text.length > 0 && text.length < MIN_LETTERS;
+  useEffect(() => {
+    const next = text.length >= MIN_LETTERS ? text : "";
+    if (next === tagFilter) return;
+
+    const timer = setTimeout(() => onApplyTag(next), 400);
+    return () => clearTimeout(timer);
+  }, [text, tagFilter, onApplyTag]);
+
+  // Pressing Enter should not reload the page
+  const handleSubmit = (e) => e.preventDefault();
 
   const clearTag = () => {
     setInput("");
@@ -23,13 +38,14 @@ export default function FilterBar({ tagFilter, showFavorites, onApplyTag, onTogg
       <form onSubmit={handleSubmit}>
         <input
           type="text"
-          placeholder="Filter by tag: beach"
+          placeholder="Search by tag, e.g. bea → #beach"
           value={input}
           onChange={(e) => setInput(e.target.value)}
         />
-        <button type="submit">Search</button>
-        {tagFilter && (
-          <button type="button" onClick={clearTag}>Clear</button>
+        {input && (
+          <button type="button" onClick={clearTag}>
+            Clear
+          </button>
         )}
       </form>
 
@@ -40,6 +56,12 @@ export default function FilterBar({ tagFilter, showFavorites, onApplyTag, onTogg
       >
         {showFavorites ? "⭐ Showing favorites" : "☆ Favorites only"}
       </button>
+
+      {tooShort && (
+        <p className="muted filter-hint">
+          Type at least {MIN_LETTERS} letters to search
+        </p>
+      )}
     </div>
   );
 }

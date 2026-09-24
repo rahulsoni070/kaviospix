@@ -3,16 +3,20 @@ import api from "../api/axios";
 
 export default function ShareForm({ albumId, sharedWith, onShared }) {
   const [users, setUsers] = useState([]);
-  const [selected, setSelected] = useState("");
+  const [usersError, setUsersError] = useState("");
   const [loadingUsers, setLoadingUsers] = useState(true);
+  const [selected, setSelected] = useState("");
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
   useEffect(() => {
-    api.get("/users")
+    api
+      .get("/users")
       .then((res) => setUsers(res.data))
-      .catch(() => setError("Could not load users"))
+      .catch((err) =>
+        setUsersError(err.response?.data?.message || "Could not load users")
+      )
       .finally(() => setLoadingUsers(false));
   }, []);
 
@@ -52,6 +56,8 @@ export default function ShareForm({ albumId, sharedWith, onShared }) {
 
       {loadingUsers ? (
         <p className="muted">Loading users...</p>
+      ) : usersError ? (
+        <p className="error">{usersError}</p>
       ) : available.length === 0 ? (
         <p className="muted">
           No other users to share with. Ask your friend to sign in to KaviosPix once.
