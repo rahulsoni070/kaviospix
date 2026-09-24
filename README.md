@@ -1,16 +1,252 @@
-# React + Vite
+# KaviosPix
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A Google Photos–style image management app: sign in with Google, create albums, upload photos with tags, mark favorites, add comments, and share albums with friends by email.
+Built with a React frontend, Express/Node backend, MongoDB (Mongoose) database, Cloudinary for image storage, and Google OAuth 2.0 + JWT authentication with owner/shared-user permissions.
 
-Currently, two official plugins are available:
+## Demo Link
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+[Live Demo](https://kaviospix-rahul.vercel.app)  •  [Backend API](https://kaviospix-backend-kpzw.onrender.com)
 
-## React Compiler
+> The backend runs on Render's free plan and sleeps after ~15 minutes of inactivity. The first request can take about 50 seconds while it wakes up.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Login
 
-## Expanding the ESLint configuration
+Sign in with any Google account. No password or sign-up needed.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+To try sharing, open the app in a second browser (or an Incognito window) with a different Google account, then share an album with that account's email.
+
+## Quick Start
+
+The frontend and backend are in separate GitHub repos.
+
+### Backend
+
+```
+git clone https://github.com/rahulsoni070/kaviospix-backend.git
+cd kaviospix-backend
+npm install
+npm run dev
+```
+
+Runs on `http://localhost:3000`
+
+### Frontend
+
+```
+git clone https://github.com/rahulsoni070/kaviospix-frontend.git
+cd kaviospix-frontend
+npm install
+npm run dev
+```
+
+Runs on `http://localhost:5173`
+
+## Environment Variables
+
+Create a `.env` file in the backend with:
+
+```
+PORT=3000
+MONGODB_URI=<your-mongodb-connection-string>
+JWT_SECRET=<your-secret-key>
+JWT_EXPIRES_IN=7d
+GOOGLE_CLIENT_ID=<your-google-oauth-client-id>
+GOOGLE_CLIENT_SECRET=<your-google-oauth-client-secret>
+GOOGLE_CALLBACK_URL=http://localhost:3000/auth/google/callback
+CLIENT_URL=http://localhost:5173
+CLOUDINARY_CLOUD_NAME=<your-cloudinary-cloud-name>
+CLOUDINARY_API_KEY=<your-cloudinary-api-key>
+CLOUDINARY_API_SECRET=<your-cloudinary-api-secret>
+```
+
+Create a `.env` file in the frontend with:
+
+```
+VITE_SERVER_URL=http://localhost:3000
+```
+
+In Google Cloud Console, create an OAuth client (Web application) and add `http://localhost:3000/auth/google/callback` as an Authorized redirect URI.
+
+## Technologies
+
+* React JS
+* React Router
+* Vite
+* Axios
+* Node.js
+* Express
+* MongoDB (Mongoose)
+* Passport.js (Google OAuth 2.0)
+* JWT (JSON Web Token)
+* Multer
+* Cloudinary
+* Helmet, CORS, express-rate-limit
+* Deployed on Vercel (frontend), Render (backend) and MongoDB Atlas
+
+## Features
+
+### Authentication
+
+* Sign in with Google (OAuth 2.0)
+* JWT issued after login and sent with every API request
+* Protected pages; expired or invalid tokens log the user out automatically
+
+### Albums
+
+* Create albums with a name and description
+* Update album description
+* Delete an album along with all its photos (files are also removed from Cloudinary)
+* "My albums" and "Shared with me" sections
+
+### Photos
+
+* Upload images (jpg, png, gif, etc.) up to 5MB
+* Add tags, person name, and favorite status while uploading
+* Photo grid with pagination
+* Mark or unmark photos as favorite
+* Delete photos
+
+### Comments
+
+* Add comments to any photo in an album you can access
+* Each comment shows the author's name, profile photo, and time
+
+### Search & Filters
+
+* Filter photos by tag
+* Show favorites only
+
+### Sharing & Permissions
+
+* Share an album with other registered users by email
+
+| Action | Owner | Shared user |
+| --- | :---: | :---: |
+| View album and photos | ✅ | ✅ |
+| Add comments | ✅ | ✅ |
+| Upload, favorite or delete photos | ✅ | ❌ |
+| Edit, share or delete the album | ✅ | ❌ |
+
+### Security
+
+* Helmet security headers
+* CORS restricted to the frontend URL
+* Rate limiting (100 requests per 15 minutes per IP)
+* 10kb JSON body limit
+* File type and size checked on both frontend and backend
+* A photo can only be accessed through the album it belongs to (prevents IDOR)
+
+## API Reference
+
+Auth routes are served under `/auth`; all other routes are served under `/api`. All `/api` routes require an `Authorization: Bearer <token>` header.
+
+### Auth
+
+`GET /auth/google` — Start Google sign-in
+
+`GET /auth/google/callback` — Google redirects here after sign-in; the backend then redirects to `<CLIENT_URL>/oauth-success?token=<JWT>`
+
+`GET /api/me` — Get the logged-in user
+Sample Response:
+
+```
+{ "_id": "...", "name": "...", "email": "...", "avatar": "..." }
+```
+
+### Albums
+
+`GET /api/albums` — List albums you own and albums shared with you
+Sample Response:
+
+```
+[{ "_id": "...", "name": "Goa 2024", "description": "...", "ownerId": "...", "sharedWith": ["friend@gmail.com"] }, ...]
+```
+
+`POST /api/albums` — Create an album
+Body:
+
+```
+{ "name": "Goa 2024", "description": "Photos from my trip to Goa" }
+```
+
+`GET /api/albums/:albumId` (owner or shared) — Get one album
+Sample Response:
+
+```
+{ "_id": "...", "name": "...", "description": "...", "ownerId": { "_id": "...", "name": "...", "email": "...", "avatar": "..." }, "sharedWith": [...], "imageCount": 4, "isOwner": true }
+```
+
+`PUT /api/albums/:albumId` (owner) — Update album description
+
+`DELETE /api/albums/:albumId` (owner) — Delete the album and all its photos
+Sample Response:
+
+```
+{ "message": "Album deleted", "albumId": "...", "imagesDeleted": 4 }
+```
+
+`POST /api/albums/:albumId/share` (owner) — Share with users by email
+Body:
+
+```
+{ "emails": ["friend@gmail.com"] }
+```
+
+### Images
+
+`GET /api/albums/:albumId/images` (owner or shared) — List photos (supports `page`, `limit` (max 50) and `tags`)
+Sample Response:
+
+```
+{ "images": [{ "_id": "...", "name": "beach.jpg", "imageUrl": "https://res.cloudinary.com/...", "tags": ["beach"], "person": "Rahul", "isFavorite": true, "size": 310053, "comments": [...], "uploadedAt": "..." }], "page": 1, "limit": 20, "total": 4, "totalPages": 1 }
+```
+
+`GET /api/albums/:albumId/images?tags=beach` — Filter photos by tag
+
+`GET /api/albums/:albumId/images/favorites` (owner or shared) — List favorite photos
+
+`POST /api/albums/:albumId/images` (owner) — Upload a photo (multipart/form-data)
+Fields: `image` (file), `tags` (e.g. `beach, sunset`), `person`, `isFavorite`
+
+`PUT /api/albums/:albumId/images/:imageId/favorite` (owner) — Mark or unmark as favorite
+Body:
+
+```
+{ "isFavorite": true }
+```
+
+`POST /api/albums/:albumId/images/:imageId/comments` (owner or shared) — Add a comment (max 500 characters)
+Body:
+
+```
+{ "comment": "Beautiful sunset!" }
+```
+
+Sample Response:
+
+```
+{ "_id": "...", "text": "Beautiful sunset!", "userId": { "_id": "...", "name": "...", "avatar": "..." }, "createdAt": "..." }
+```
+
+`DELETE /api/albums/:albumId/images/:imageId` (owner) — Delete a photo (also removed from Cloudinary)
+
+### Error Responses
+
+| Status | Meaning |
+| --- | --- |
+| 400 | Invalid id, missing field, wrong file type or file too large |
+| 401 | Missing, invalid or expired token |
+| 403 | Logged in, but not allowed (e.g. a shared user trying to delete) |
+| 404 | Album or photo not found |
+
+## Design Decisions
+
+* **Cloudinary for images:** photos are stored on Cloudinary; MongoDB only stores the image URL and `publicId` (used to delete the file later).
+* **MongoDB `_id` as the id:** every document already has a unique `_id`, so no separate UUID field is used.
+* **Emails in `sharedWith`:** albums store lowercased emails, which makes "shared with me" a simple lookup by the user's email.
+* **Comments as objects:** each comment stores `text`, `userId` and `createdAt` instead of a plain string, so the app can show who wrote it and when.
+* **JWT instead of sessions:** stateless auth that works across the separate frontend (Vercel) and backend (Render) domains.
+
+## Contact
+
+For bugs or feature requests, please reach out to [rahulsoni66676@gmail.com](mailto:rahulsoni66676@gmail.com)
