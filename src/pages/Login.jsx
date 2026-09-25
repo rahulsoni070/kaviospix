@@ -24,7 +24,7 @@ export default function Login() {
           Sign in with Google
         </a>
 
-        <Link to="/" className="login-back">← Back to home</Link>
+        <Link to="/" className="back-btn login-back">← Back to home</Link>
       </div>
     </div>
   );
